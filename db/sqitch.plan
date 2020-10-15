@@ -1,0 +1,4 @@
+%syntax-version=1.0.0
+%project=todo
+%uri=https://github.com/vyorkin/ocaml-todo.git
+
