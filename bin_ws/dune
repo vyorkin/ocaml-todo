@@ -1,9 +1,11 @@
 (executable
  (name todo_ws)
  (libraries
-   todo
-   websocket
+   todo_base
+   todo_model
+   todo_db
    core
+   websocket
    dotenv
    fmt
    logs

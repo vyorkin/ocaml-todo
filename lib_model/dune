@@ -1,0 +1,6 @@
+(library
+ (name todo_model)
+ (libraries core bignum fmt)
+ (preprocess
+  (pps
+    ppx_deriving.show)))

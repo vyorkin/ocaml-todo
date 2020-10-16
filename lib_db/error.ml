@@ -1,5 +1,6 @@
-type error =
+type t =
   | DbError of string
+  [@@deriving show { with_path = false }]
 
 let or_error m =
   match%lwt m with

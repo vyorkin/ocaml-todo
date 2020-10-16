@@ -1,20 +1,16 @@
 (executable
  (name todo_http)
  (libraries
-   todo
+   todo_base
+   todo_model
+   todo_db
    opium
    yojson
-   ppx_rapper.runtime
-   caqti
-   caqti-driver-postgresql
-   caqti-lwt
-   lwt.unix
    core
    dotenv
    fmt
    logs
-   logs.fmt
-   logs.lwt)
+   logs.fmt)
  (preprocess
   (pps
     ppx_sexp_conv
