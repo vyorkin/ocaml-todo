@@ -4,7 +4,6 @@
  (libraries
    todo_base
    todo_model
-   opium
    ppx_rapper.runtime
    caqti
    caqti-driver-postgresql
