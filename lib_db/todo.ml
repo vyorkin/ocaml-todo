@@ -1,5 +1,4 @@
 open Todo_model
-open Error
 
 module Status : Rapper.CUSTOM = struct
   type t =
@@ -50,7 +49,7 @@ let all () =
     C.fold Query.all (fun (id, content) acc ->
         { Todo.id; content } :: acc) () []
   in
-  Caqti_lwt.Pool.use all' pool |> or_db_error
+  Caqti_lwt.Pool.use all' pool |> Error.unwrap
 
 (* let all' =
  *   [%rapper get_many
@@ -63,16 +62,16 @@ let insert content =
   let insert' content (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.insert content
   in
-  Caqti_lwt.Pool.use (insert' content) pool |> or_db_error
+  Caqti_lwt.Pool.use (insert' content) pool |> Error.unwrap
 
 let delete id =
   let delete' id (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.delete id
   in
-  Caqti_lwt.Pool.use (delete' id) pool |> or_db_error
+  Caqti_lwt.Pool.use (delete' id) pool |> Error.unwrap
 
 let clear () =
   let clear' (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.clear ()
   in
-  Caqti_lwt.Pool.use clear' pool |> or_db_error
+  Caqti_lwt.Pool.use clear' pool |> Error.unwrap
