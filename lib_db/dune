@@ -2,6 +2,9 @@
  (name todo_db)
  (inline_tests)
  (libraries
+   todo_base
+   todo_model
+   opium
    ppx_rapper.runtime
    caqti
    caqti-driver-postgresql
@@ -12,5 +15,6 @@
  (preprocess
   (pps
     lwt_ppx
+    ppx_sexp_conv
     ppx_deriving.show
     ppx_rapper)))

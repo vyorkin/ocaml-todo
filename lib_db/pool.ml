@@ -1,6 +1,12 @@
 open Caqti_lwt
 
-let make url ?(max_size = 10) =
-  match connect_pool ~max_size (Uri.of_string url) with
-  | Ok pool -> pool
-  | Error err -> failwith (Caqti_error.show err)
+type 'e t =
+  (connection, [> Caqti_error.connect] as 'e) Caqti_lwt.Pool.t
+
+let make ~max_size url =
+  url
+  |> Uri.of_string
+  |> connect_pool ~max_size
+  |> function
+    | Ok pool -> pool
+    | Error err -> failwith (Caqti_error.show err)

@@ -1,4 +1,5 @@
 open Todo_model
+open Error
 
 module Status : Rapper.CUSTOM = struct
   type t =
@@ -42,36 +43,36 @@ module Query = struct
       "TRUNCATE TABLE todo.todos"
 end
 
-let pool = Pool.create "postgresql://postgres@localhost:5432/todo"
+let pool = Pool.make ~max_size:5 "postgresql://postgres@localhost:5432/todo"
 
 let all () =
   let all' (module C : Caqti_lwt.CONNECTION) =
     C.fold Query.all (fun (id, content) acc ->
-        { id; content } :: acc) () []
+        { Todo.id; content } :: acc) () []
   in
-  Caqti_lwt.Pool.use all' pool |> or_error
+  Caqti_lwt.Pool.use all' pool |> or_db_error
 
-let all' =
-  [%rapper get_many
-   {sql|
-    SELECT @int{id}, %string{content}
-    FROM todo.todos
-   |sql}]
+(* let all' =
+ *   [%rapper get_many
+ *    {sql|
+ *     SELECT @int{id}, %string{content}
+ *     FROM todo.todos
+ *    |sql} record_out] *)
 
 let insert content =
   let insert' content (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.insert content
   in
-  Caqti_lwt.Pool.use (insert' content) pool |> or_error
+  Caqti_lwt.Pool.use (insert' content) pool |> or_db_error
 
 let delete id =
   let delete' id (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.delete id
   in
-  Caqti_lwt.Pool.use (delete' id) pool |> or_error
+  Caqti_lwt.Pool.use (delete' id) pool |> or_db_error
 
 let clear () =
   let clear' (module C : Caqti_lwt.CONNECTION) =
     C.exec Query.clear ()
   in
-  Caqti_lwt.Pool.use clear' pool |> or_error
+  Caqti_lwt.Pool.use clear' pool |> or_db_error

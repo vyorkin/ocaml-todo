@@ -2,6 +2,6 @@ with import <nixpkgs> { };
 
 pkgs.mkShell {
   buildInputs = [
-    gmp pkg-config postgresql
+    gmp pcre libffi pkg-config postgresql
   ];
 }

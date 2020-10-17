@@ -8,3 +8,5 @@ type t =
   { id: int;
     content: string;
   } [@@deriving show { with_path = false }]
+
+let make ~id ~content = { id; content }

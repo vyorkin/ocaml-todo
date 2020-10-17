@@ -2,7 +2,7 @@ type t =
   | DbError of string
   [@@deriving show { with_path = false }]
 
-let or_error m =
+let or_db_error m =
   match%lwt m with
   | Ok x ->
      Lwt.return (Ok x)
