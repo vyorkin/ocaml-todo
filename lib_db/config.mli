@@ -1,2 +1,2 @@
 (** Creates a database connection url. *)
-val make : unit -> string
+val db_uri : unit -> Uri.t

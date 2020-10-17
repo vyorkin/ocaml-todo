@@ -42,7 +42,9 @@ module Query = struct
       "TRUNCATE TABLE todo.todos"
 end
 
-let pool = Pool.make ~max_size:5 "postgresql://postgres@localhost:5432/todo"
+let pool =
+  let uri = Config.db_uri () in
+  Pool.make ~uri ~max_size:5
 
 let all () =
   let all' (module C : Caqti_lwt.CONNECTION) =

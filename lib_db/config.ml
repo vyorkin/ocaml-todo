@@ -14,8 +14,9 @@ let get_db () =
   |> Sys.getenv_opt
   |> Option.value ~default:"todo"
 
-let make () =
+let db_uri () =
   let host = get_host () in
   let port = get_port () in
   let db = get_db () in
-  Printf.sprintf "postgresql://%s:%i/%s" host port db
+  let uri = Printf.sprintf "postgresql://%s:%i/%s" host port db in
+  Uri.of_string uri

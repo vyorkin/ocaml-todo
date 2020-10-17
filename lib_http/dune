@@ -1,0 +1,7 @@
+(library
+ (name todo_http)
+ (libraries core opium fmt logs logs.fmt)
+ (preprocess
+  (pps
+    ppx_deriving.show
+    ppx_yojson_conv)))

@@ -9,6 +9,7 @@
    caqti-driver-postgresql
    caqti-lwt
    core
+   uri
    logs
    logs.fmt)
  (preprocess
