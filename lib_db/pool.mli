@@ -7,3 +7,6 @@ type 'e t =
 (** Creates a new connection pool of size [max_size] given a connection [Uri.t].
     The URI should be something like ["postgresql://username:password@localhost:5432/postgres"]. *)
 val make : uri:Uri.t -> max_size:int -> 'e t
+
+(** Default database connection pool. *)
+val default : 'e t

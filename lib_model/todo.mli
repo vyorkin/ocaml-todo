@@ -7,6 +7,6 @@ type status =
 type t =
   { id: int;
     content: string;
-  } [@@deriving show, yojson]
+  } [@@deriving show, to_yojson]
 
 val make: id:int -> content:string -> t

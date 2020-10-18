@@ -1,9 +1,9 @@
 open Todo_model
 
-val all : unit -> (Todo.t list, Error.t) result Lwt.t
+val create : Todo.t -> (unit, string) Lwt_result.t
 
-val insert : string -> (unit, Error.t) result Lwt.t
+val find : int -> (Todo.t, string) Lwt_result.t
 
-val delete : int -> (unit, Error.t) result Lwt.t
+val all : unit -> (Todo.t list, string) Lwt_result.t
 
-val clear : unit -> (unit, Error.t) result Lwt.t
+val destroy : int -> (unit, string) Lwt_result.t

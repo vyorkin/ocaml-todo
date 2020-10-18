@@ -8,7 +8,7 @@ let init app =
 
 let () =
   let _= Dotenv.export () in
-  match Server.run () with
+  match Server.run ~name:"todo" with
   | `Ok app ->
      let app' = init app in
      Lwt.async (fun () -> let* () = app' in Lwt.return_unit);

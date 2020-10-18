@@ -8,3 +8,7 @@ let make ~uri ~max_size =
   |> connect_pool ~max_size
   |> function | Ok pool -> pool
               | Error err -> failwith (Caqti_error.show err)
+
+let default =
+  let uri = Config.db_uri () in
+  make ~uri ~max_size:5

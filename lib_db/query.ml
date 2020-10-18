@@ -7,7 +7,7 @@ type nonrec ('r, 'e) result =
 type ('r, 'e) t =
   ('r, [< Caqti_error.t > `Connect_failed `Connect_rejected `Post_connect ] as 'e) callback
 
-let run ~pool query =
+let run ?(pool = Pool.default) query =
   pool
   |> Caqti_lwt.Pool.use query
   |> Lwt_result.map_err Caqti_error.show
