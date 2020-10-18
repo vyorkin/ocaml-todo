@@ -65,14 +65,10 @@ module Q = struct
     ]
 end
 
-let create todo =
-  Query.run (fun c -> Q.create todo c)
+let create todo = Query.run (Q.create todo)
 
-let find id =
-  Query.run (fun c -> Q.find ~id c)
+let find id = Query.run (Q.find ~id)
 
-let all () =
-  Query.run (fun c -> Q.all () c)
+let all () = Query.run (Q.all ())
 
-let destroy id =
-  Query.run (fun c -> Q.destroy ~id c)
+let destroy id = Query.run (Q.destroy ~id)
