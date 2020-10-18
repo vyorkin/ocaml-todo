@@ -1,25 +1,22 @@
-open Core_kernel
-open Opium.Std
-open Lwt.Infix
-
 module Logging = struct
-  open Httpaf
+  open Core
+  open Lwt.Infix
+  open Opium.Std
 
   let middleware =
-    let filter handler req =
-      handler req >|= fun res ->
-      let meth = Method.of_string req.meth in
+    let filter handler (req: Request.t) =
+      handler req >|= fun (res: Response.t) ->
+      let meth = Httpaf.Method.to_string req.meth in
       let uri = req.target |> Uri.of_string |> Uri.path_and_query in
-      let code = Status.to_string res.status in
+      let code = Httpaf.Status.to_string res.status in
       let zone = Time.get_sexp_zone () in
-      let time = Time.to_sec_string ~zone Time.now () in
+      let time = Time.now () |> Time.to_sec_string ~zone in
       Logs.info (fun m -> m "%s \"%s\" (%s) -> %s" meth uri time code);
       res
     in
     Rock.Middleware.create ~name:"Logging" ~filter
-
 end
 
 module Metrics = struct
-  open Prometheus
+  (* open Prometheus *)
 end
