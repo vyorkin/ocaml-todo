@@ -1,8 +1,3 @@
-module Logging: sig
-  open Opium.Std
+open Opium.Std
 
-  val middleware : Rock.Middleware.t
-end
-
-module Metrics: sig
-end
+val logging : Rock.Middleware.t

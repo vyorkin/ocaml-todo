@@ -1,5 +1,5 @@
 (executable
- (name todo_ws)
+ (name todo_server_ws)
  (libraries
    todo_base
    todo_model

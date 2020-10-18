@@ -7,6 +7,6 @@ type status =
 type t =
   { id: int;
     content: string;
-  } [@@deriving show { with_path = false }]
+  } [@@deriving show { with_path = false }, yojson]
 
 let make ~id ~content = { id; content }

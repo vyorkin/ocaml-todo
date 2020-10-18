@@ -1,14 +1,16 @@
 (executable
- (name todo_http)
+ (name todo_server_http)
  (libraries
    todo_base
    todo_model
    todo_db
+   todo_http
    opium
    yojson
    core
    dotenv
    fmt
+   fmt.tty
    logs
    logs.fmt)
  (preprocess
