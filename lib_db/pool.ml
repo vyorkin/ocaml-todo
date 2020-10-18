@@ -11,4 +11,4 @@ let make ~uri ~max_size =
 
 let default =
   let uri = Config.db_uri () in
-  make ~uri ~max_size:5
+  lazy (make ~uri ~max_size:5)

@@ -10,4 +10,4 @@ type ('r, 'e) t =
 (** Runs a query callback, gives it a [Caqti_lwt.connection] from
     ['e Pool.t] and returns [Ok 'r] of ['r] obtained by executing a database query,
     otherwise returns [Error 'e] reporting an error causing query to fail. *)
-val run : ?pool:'e Pool.t -> ('r, 'e) t -> ('r, string) Lwt_result.t
+val run : ?pool:'e Pool.t Lazy.t -> ('r, 'e) t -> ('r, string) Lwt_result.t

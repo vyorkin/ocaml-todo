@@ -10,9 +10,9 @@ let add_middleware app =
 let add_routes app =
   let open Handler in
   app
-  |> get "/todo" Todo.index
-  (* |> get "/todo/:id" Todo.show
-   * |> post "/todo" Todo.create
+  (* |> get "/todo" Todo.index *)
+  |> get "/todo/:id" Todo.show
+  (* |> post "/todo" Todo.create
    * |> put "/todo/:id" Todo.update
    * |> delete "/todo/:id" Todo.destroy *)
 

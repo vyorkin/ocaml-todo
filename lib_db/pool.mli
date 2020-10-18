@@ -9,4 +9,4 @@ type 'e t =
 val make : uri:Uri.t -> max_size:int -> 'e t
 
 (** Default database connection pool. *)
-val default : 'e t
+val default : 'e t Lazy.t

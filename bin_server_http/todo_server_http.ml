@@ -7,7 +7,7 @@ let init app =
   app
 
 let () =
-  let _= Dotenv.export () in
+  let _ = Dotenv.export () in
   match Server.run ~name:"todo" with
   | `Ok app ->
      let app' = init app in
