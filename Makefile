@@ -3,6 +3,9 @@
 default:
 	dune build
 
+http-server:
+	dune exe ./bin_server_http/todo_server_http.exe
+
 test:
 	dune exe ./test/testsuite.exe
 
