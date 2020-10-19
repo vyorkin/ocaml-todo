@@ -1,14 +1,11 @@
-open Opium.Std
-
-module Db = Todo_db
-module Model = Todo_model
-
 module Todo = struct
-  let show (req : Request.t) =
-    let id = Router.param req "id" |> int_of_string in
-    match%lwt Db.Todo.find id with
-    | Ok x ->
-       Lwt.return @@ Response.of_json (Model.Todo.to_yojson x)
-    | Error err ->
-       Lwt.return @@ Response.of_json  (`Assoc [ "error", `String err ])
+  open Todo_model
+  open Todo_http
+  open Todo_db.Todo
+
+  let show =
+    Endpoint.show Todo.to_yojson find
+
+  let index =
+    Endpoint.index Todo.to_yojson all
 end

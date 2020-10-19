@@ -34,7 +34,7 @@ module Q = struct
 
   let find =
     let open Todo in
-    [%rapper get_one
+    [%rapper get_opt
         {sql|
         SELECT
           @int{id},
