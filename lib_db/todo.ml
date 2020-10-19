@@ -22,15 +22,19 @@ module Status : Rapper.CUSTOM = struct
 end
 
 module Q = struct
-  let [@warning "-9"] create  =
+  let create todo =
     let open Todo in
-    [%rapper execute
+    [%rapper get_one
         {sql|
         INSERT INTO todo.todos(content)
         VALUES (%string{content})
+        RETURNING id
         |sql}
         record_in
+        function_out
     ]
+    (fun ~id -> { todo with id = Some id } )
+    todo
 
   let find =
     let open Todo in

@@ -5,8 +5,8 @@ type status =
   [@@deriving show]
 
 type t =
-  { id: int;
+  { id: int option;
     content: string;
   } [@@deriving show, to_yojson]
 
-val make: id:int -> content:string -> t
+val make: id:int option -> content:string -> t

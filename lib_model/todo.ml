@@ -2,11 +2,11 @@ type status =
   | Pending
   | InProgress
   | Done
-  [@@deriving show { with_path = false }]
+  [@@deriving show]
 
 type t =
-  { id: int;
+  { id: int option;
     content: string;
-  } [@@deriving show { with_path = false }, to_yojson]
+  } [@@deriving show, to_yojson]
 
 let make ~id ~content = { id; content }
