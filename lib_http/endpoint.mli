@@ -11,14 +11,21 @@ val handle :
   Request.t ->
   Response.t Lwt.t
 
+val create :
+  (Yojson.Safe.t -> 'a) ->
+  ('b -> Yojson.Safe.t) ->
+  ('a -> ('b, 'c) Lwt_result.t) ->
+  Request.t ->
+  Response.t Lwt.t
+
 val show :
   ('a -> Yojson.Safe.t) ->
-  (int -> ('a option, string) Lwt_result.t) ->
+  (int -> ('a option, 'c) Lwt_result.t) ->
   Request.t ->
   Response.t Lwt.t
 
 val index :
   ('a -> Yojson.Safe.t) ->
-  (unit -> ('a list, string) Lwt_result.t) ->
+  (unit -> ('a list, 'c) Lwt_result.t) ->
   Request.t ->
   Response.t Lwt.t

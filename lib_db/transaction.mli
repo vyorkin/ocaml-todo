@@ -1,4 +1,6 @@
+open Caqti_lwt
+
 val run :
-  ((module Caqti_lwt.CONNECTION) -> ('r, ([> Caqti_error.transact] as 'e)) result Lwt.t) ->
-  (module Caqti_lwt.CONNECTION) ->
+  ((module CONNECTION) -> ('r, ([> Caqti_error.transact] as 'e)) result Lwt.t) ->
+  (module CONNECTION) ->
   ('r, 'e) result Lwt.t

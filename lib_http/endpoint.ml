@@ -1,4 +1,6 @@
-type t = Opium.Std.Request.t -> Opium.Std.Response.t Lwt.t
+module Request = Opium.Std.Request
+
+type t = Request.t -> Opium.Std.Response.t Lwt.t
 
 module Param = struct
   open Opium.Std
@@ -7,20 +9,33 @@ module Param = struct
 
   let id (req: Request.t) =
     "id" |> Router.param req |> int_of_string |> Lwt.return
+
+  let json f (req: Request.t) =
+    let open Lwt.Syntax in
+    let+ json = Request.to_json_exn req in
+    f json
 end
 
-let handle ~input ~output f (req : Opium.Std.Request.t) =
+let log_error err =
+  let msg = Printexc.to_string err in
+  let stack = Printexc.get_backtrace () in
+  Logs.err (fun m -> m "Uncaught exception: %s\n%s" msg stack)
+
+let handle ~input ~output f (req : Request.t) =
+  let open Lwt.Syntax in
   try
-    let%lwt payload = input req in
+    let* payload = input req in
     match%lwt f payload with
     | Ok result -> output result
     | Error err -> Response.error err
   with err ->
-    let msg = Printexc.to_string err and
-        stack = Printexc.get_backtrace ()
-    in
-    Logs.err (fun m -> m "Uncaught exception: %s\n%s" msg stack);
+    log_error err;
     Response.internal_server_error ()
+
+let create of_json to_json =
+  handle
+    ~input:(Param.json of_json)
+    ~output:(Response.json to_json)
 
 let show to_json =
   handle

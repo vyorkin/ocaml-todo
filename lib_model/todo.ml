@@ -5,7 +5,7 @@ type status =
   [@@deriving show]
 
 type t =
-  { id: int option;
+  { id: int;
     content: string;
   } [@@deriving show, to_yojson]
 
