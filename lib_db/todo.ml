@@ -1,4 +1,3 @@
-open Caqti_lwt
 open Todo_model
 
 module Status : Rapper.CUSTOM = struct
@@ -23,14 +22,19 @@ module Status : Rapper.CUSTOM = struct
 end
 
 module Q = struct
-  let create =
-    Caqti_request.find
-    Caqti_type.string
-    Caqti_type.int
-    {sql|
-    INSERT INTO todo.todos(content)
-    VALUES (%string{content})
-    |sql}
+  let [@warning "-9"] create todo =
+    let open Todo in
+    [%rapper get_one
+      {sql|
+      INSERT INTO todo.todos(content)
+      VALUES (%string{content})
+      RETURNING @int{id}
+      |sql}
+    record_in
+    function_out
+    ]
+    (fun ~id -> { todo with id })
+    todo
 
   let find =
     let open Todo in
@@ -65,14 +69,7 @@ module Q = struct
     ]
 end
 
-let create ~content =
-  let open Lwt.Infix in
-  let query = (fun (module C: CONNECTION) -> C.find Q.create content) in
-  Query.run query >|= Result.map (fun id -> Todo.make ~id ~content)
-
-(* let create' ~query f params =
- *   Query.run (fun (module C: CONNECTION) -> C.find query params)
- *   >|= Result.map f *)
+let create todo = Query.run (Q.create todo)
 
 let find id = Query.run (Q.find ~id)
 

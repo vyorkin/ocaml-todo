@@ -1,6 +1,6 @@
 open Todo_model
 
-val create : content:string -> (Todo.t, string) Lwt_result.t
+val create : Todo.t -> (Todo.t, string) Lwt_result.t
 
 val find : int -> (Todo.t option, string) Lwt_result.t
 

@@ -1,5 +1,7 @@
+open Caqti_lwt
+
 let run query connection =
-  let (module C : Caqti_lwt.CONNECTION) = connection in
+  let (module C : CONNECTION) = connection in
   let%lwt _ = C.start () in
   match%lwt query connection with
   | Ok result ->
