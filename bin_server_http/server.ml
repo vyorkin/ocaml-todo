@@ -12,9 +12,9 @@ let add_routes app =
   app
   |> get "/todo" Todo.index
   |> get "/todo/:id" Todo.show
-  (* |> post "/todo" Todo.create
-   * |> put "/todo/:id" Todo.update
-   * |> delete "/todo/:id" Todo.destroy *)
+  |> post "/todo" Todo.create
+  |> put "/todo/:id" Todo.update
+  |> delete "/todo/:id" Todo.delete
 
 let init app =
   app

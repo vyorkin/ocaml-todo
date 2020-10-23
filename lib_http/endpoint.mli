@@ -18,6 +18,19 @@ val create :
   Request.t ->
   Response.t Lwt.t
 
+val update :
+  (Yojson.Safe.t -> 'a) ->
+  ('b -> Yojson.Safe.t) ->
+  (int * 'a -> 'c) ->
+  ('c -> ('b, 'd) Lwt_result.t) ->
+  Request.t ->
+  Response.t Lwt.t
+
+val delete :
+  (int -> (unit, string) Lwt_result.t) ->
+  Request.t ->
+  Response.t Lwt.t
+
 val show :
   ('a -> Yojson.Safe.t) ->
   (int -> ('a option, 'c) Lwt_result.t) ->

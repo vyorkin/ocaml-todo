@@ -5,8 +5,8 @@ type status =
   [@@deriving show]
 
 type t =
-  { id: int;
+  { id: int [@default 0];
     content: string;
-  } [@@deriving show, to_yojson]
+  } [@@deriving show, yojson { exn = true }]
 
 let make ~id ~content = { id; content }

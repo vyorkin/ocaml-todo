@@ -26,8 +26,10 @@ module Q = struct
     let open Todo in
     [%rapper get_one
       {sql|
-      INSERT INTO todo.todos(content)
-      VALUES (%string{content})
+      INSERT INTO todo.todos
+      (content)
+      VALUES
+      (%string{content})
       RETURNING @int{id}
       |sql}
     record_in
@@ -35,6 +37,17 @@ module Q = struct
     ]
     (fun ~id -> { todo with id })
     todo
+
+  let update =
+    let open Todo in
+    [%rapper execute
+      {sql|
+      UPDATE todo.todos
+      SET content = %string{content}
+      WHERE id = %int{id}
+      |sql}
+    record_in
+    ]
 
   let find =
     let open Todo in
@@ -64,12 +77,15 @@ module Q = struct
   let destroy =
     [%rapper execute
         {sql|
-        DELETE FROM todo.todos WHERE id = %int{id}
+        DELETE FROM todo.todos
+        WHERE id = %int{id}
         |sql}
     ]
 end
 
 let create todo = Query.run (Q.create todo)
+
+let update todo = Query.run (Q.update todo)
 
 let find id = Query.run (Q.find ~id)
 
