@@ -8,11 +8,7 @@
    opium
    yojson
    core
-   dotenv
-   fmt
-   fmt.tty
-   logs
-   logs.fmt)
+   dotenv)
  (preprocess
   (pps
     lwt_ppx

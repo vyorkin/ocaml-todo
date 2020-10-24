@@ -6,8 +6,9 @@ type 'e t =
 let make ~uri ~max_size =
   uri
   |> connect_pool ~max_size
-  |> function | Ok pool -> pool
-              | Error err -> failwith (Caqti_error.show err)
+  |> function
+    | Ok pool -> pool
+    | Error err -> failwith (Caqti_error.show err)
 
 let default =
   let uri = Config.db_uri () in

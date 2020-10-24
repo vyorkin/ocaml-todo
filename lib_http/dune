@@ -1,6 +1,6 @@
 (library
  (name todo_http)
- (libraries core opium httpaf prometheus fmt logs logs.fmt)
+ (libraries core opium httpaf prometheus fmt fmt.tty logs logs.fmt)
  (preprocess
   (pps
     lwt_ppx

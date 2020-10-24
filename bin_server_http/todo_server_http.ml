@@ -1,6 +1,8 @@
 open Lwt.Syntax
 open Core_kernel
 
+open Todo_http
+
 let init app =
   let reporter = Log.default_reporter () in
   Logs.set_reporter reporter;
