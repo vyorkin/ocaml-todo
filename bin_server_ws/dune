@@ -1,14 +1,6 @@
 (executable
  (name todo_server_ws)
- (libraries
-   todo_base
-   todo_model
-   todo_db
-   core
-   websocket
-   dotenv
-   fmt
-   logs
-   logs.fmt)
+ (libraries todo_base todo_model todo_db core websocket-lwt-unix dotenv fmt
+   logs logs.lwt logs.fmt)
  (preprocess
-  (pps ppx_deriving.show)))
+  (pps ppx_let lwt_ppx ppx_deriving.show)))

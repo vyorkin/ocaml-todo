@@ -1,17 +1,5 @@
 (executable
  (name todo_server_http)
- (libraries
-   todo_base
-   todo_model
-   todo_db
-   todo_http
-   opium
-   yojson
-   core
-   dotenv)
+ (libraries todo_base todo_model todo_db todo_http opium yojson core dotenv)
  (preprocess
-  (pps
-    lwt_ppx
-    ppx_sexp_conv
-    ppx_yojson_conv
-    ppx_deriving.show)))
+  (pps lwt_ppx ppx_sexp_conv ppx_yojson_conv ppx_deriving.show)))

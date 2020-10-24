@@ -1,8 +1,5 @@
 (library
  (name todo_http)
- (libraries core opium httpaf prometheus fmt fmt.tty logs logs.fmt)
+ (libraries todo_base core opium httpaf prometheus)
  (preprocess
-  (pps
-    lwt_ppx
-    ppx_deriving.show
-    ppx_yojson_conv)))
+  (pps lwt_ppx ppx_deriving.show ppx_yojson_conv)))

@@ -1,14 +1,13 @@
-open Lwt.Syntax
 open Core_kernel
-
-open Todo_http
+open Todo_base
 
 let init app =
-  let reporter = Log.default_reporter () in
+  let reporter = Log.make_reporter ~verbose:false in
   Logs.set_reporter reporter;
   app
 
 let () =
+  let open Lwt.Syntax in
   let _ = Dotenv.export () in
   match Server.run ~name:"todo" with
   | `Ok app ->

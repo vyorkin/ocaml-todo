@@ -25,7 +25,7 @@ let get_port () =
  "HTTP_PORT"
   |> Sys.getenv_opt
   |> Option.map int_of_string
-  |> Option.value ~default:8081
+  |> Option.value ~default:8088
 
 let run ~name =
   let port = get_port () in

@@ -1,12 +1,17 @@
 let get_level () =
   match Sys.getenv_opt "LOG_LEVEL" with
-  | Some "error" -> Some Logs.Error
-  | Some "info" -> Some Logs.Info
-  | _ -> Some Logs.Debug
+  | Some "error" -> Logs.Error
+  | Some "info" -> Logs.Info
+  | _ -> Logs.Debug
 
-let default_reporter () =
+let make_reporter ~verbose =
   Fmt_tty.setup_std_outputs ();
-  Logs.set_level @@ get_level ();
+  let level =
+    if verbose
+    then Logs.Debug
+    else get_level ()
+  in
+  Logs.set_level (Some level);
   Logs_fmt.reporter ()
 
 let unhandled_error err =

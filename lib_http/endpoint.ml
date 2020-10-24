@@ -1,3 +1,5 @@
+open Todo_base
+
 module Request = Opium.Std.Request
 
 type t = Request.t -> Opium.Std.Response.t Lwt.t

@@ -6,6 +6,9 @@ default:
 http-server:
 	dune exe ./bin_server_http/todo_server_http.exe
 
+ws-server:
+	dune exe ./bin_server_ws/todo_server_ws.exe
+
 test:
 	dune exe ./test/testsuite.exe
 

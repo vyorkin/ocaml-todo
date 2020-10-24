@@ -2,6 +2,4 @@
  (name todo_model)
  (libraries core yojson ppx_deriving_yojson.runtime bignum fmt)
  (preprocess
-  (pps
-    ppx_deriving.show
-    ppx_deriving_yojson)))
+  (pps ppx_deriving.show ppx_deriving_yojson)))

@@ -1,20 +1,7 @@
 (library
  (name todo_db)
  (inline_tests)
- (libraries
-   todo_base
-   todo_model
-   ppx_rapper.runtime
-   caqti
-   caqti-driver-postgresql
-   caqti-lwt
-   core
-   uri
-   logs
-   logs.fmt)
+ (libraries todo_base todo_model ppx_rapper.runtime caqti
+   caqti-driver-postgresql caqti-lwt core uri logs logs.fmt)
  (preprocess
-  (pps
-    lwt_ppx
-    ppx_sexp_conv
-    ppx_deriving.show
-    ppx_rapper)))
+  (pps lwt_ppx ppx_sexp_conv ppx_deriving.show ppx_rapper)))
