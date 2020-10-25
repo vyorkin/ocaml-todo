@@ -22,3 +22,9 @@ val close : t -> Client.t -> unit Lwt.t
 val close_all : t -> unit Lwt.t
 
 val connections : t -> int
+
+val broadcast_to : Client.t list -> string -> unit Lwt.t
+
+val broadcast : t -> string -> unit Lwt.t
+
+val broadcast_to_others : t -> Client.t -> string -> unit Lwt.t

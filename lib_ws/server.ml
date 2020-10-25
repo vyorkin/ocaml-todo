@@ -128,3 +128,20 @@ let close_all srv =
 
 let connections srv =
   Hashtbl.length srv.clients
+
+let broadcast_to clients msg =
+  let num_clients = List.length clients in
+  Logs.app ~src (fun m -> m "[BROADCASTING] %s to %d client(s)" msg num_clients);
+  Lwt_list.iter_p (fun client -> Client.send client msg) clients
+
+let broadcast srv =
+  broadcast_to (clients srv)
+
+let broadcast_to_others srv client msg =
+  let id = Client.id client in
+  let clients =
+    List.filter
+      ~f:(fun other -> Client.id other <> id)
+      (clients srv)
+  in
+  broadcast_to clients msg
