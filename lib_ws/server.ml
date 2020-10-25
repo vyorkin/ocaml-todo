@@ -12,9 +12,9 @@ type t =
 
 type handlers =
   { on_connect: (Client.t -> unit Lwt.t) option;
-    on_close: (Client.t -> string -> unit Lwt.t) option;
-    on_error: (Client.t -> exn -> unit Lwt.t) option;
-    on_message: (Client.t -> string -> unit Lwt.t);
+    on_close: (reason:string -> Client.t -> unit Lwt.t) option;
+    on_error: (exn:exn -> Client.t -> unit Lwt.t) option;
+    on_message: (message:string -> Client.t -> unit Lwt.t);
   }
 
 type tls =
@@ -69,14 +69,18 @@ let rec loop ~handlers srv client =
        Client.send_pong client
     | Opcode.Text
     | Opcode.Binary ->
-       let msg = frame.content in
-       Logs.app ~src (fun m -> m "[RECV] %d: %s" id msg);
-       let* () = handlers.on_message client msg in
+       let message = frame.content in
+       Logs.app ~src (fun m -> m "[RECV] %d: %s" id message);
+       let* () = handlers.on_message ~message client in
        loop ~handlers srv client
     | Opcode.Close ->
        if Client.is_connected client
-       then Hashtbl.remove srv.clients (Client.id client);
-       Client.send_close ~reason:frame.content client
+       then Hashtbl.remove srv.clients id;
+       let reason = frame.content in
+       let* () = Client.send_close ~reason client in
+       (match handlers.on_close with
+       | Some f -> f ~reason client
+       | None -> Lwt.return_unit)
     | _ ->
        Lwt.return_unit
   in
@@ -85,7 +89,7 @@ let rec loop ~handlers srv client =
     Logs.err ~src (fun m -> m "[RECV] %d: %s" id err);
     Hashtbl.remove srv.clients id;
     match handlers.on_error with
-    | Some f -> f client exn
+    | Some f -> f ~exn client
     | None -> Lwt.return_unit
   in
   Lwt.catch handle_msg handle_exn
@@ -101,7 +105,7 @@ let connect ~handlers srv conn =
   in
   loop ~handlers srv client
 
-let start srv ?on_connect ?on_close ?on_error ~on_message =
+let start ?on_connect ?on_close ?on_error ~on_message srv =
   let handlers = { on_connect; on_close; on_error; on_message } in
   establish_server ~check_request ~mode:srv.mode (connect ~handlers srv)
 
@@ -111,9 +115,12 @@ let clients srv =
     ~init:[]
     srv.clients
 
+let find srv =
+  Hashtbl.find srv.clients
+
 let close srv client =
   let id = Client.id client in
-  Logs.app ~src (fun m -> m "[CLOSING] %d" id);
+  Logs.app ~src (fun m -> m "[CLOSING] closing connection %d" id);
   match Hashtbl.find srv.clients id with
   | None ->
      Lwt.return_unit
@@ -121,6 +128,7 @@ let close srv client =
      Hashtbl.remove srv.clients id;
      let* () = Client.send_close_normal client in
      Client.set_disconnected client;
+     Logs.app ~src (fun m -> m "[CLOSED] connection closed %d" id);
      Lwt.return_unit
 
 let close_all srv =

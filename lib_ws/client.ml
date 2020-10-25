@@ -69,3 +69,6 @@ let set_connected client =
 let set_disconnected client =
   Logs.app ~src (fun m -> m "[DISCONNECTED] %d" client.id);
   client.status := Disconnected
+
+let to_string client =
+  client |> id |> string_of_int

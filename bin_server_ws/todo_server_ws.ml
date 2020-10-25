@@ -1,4 +1,5 @@
 open Core
+open Todo_ws
 
 let make_args srv =
   let open Command.Let_syntax in
@@ -17,7 +18,7 @@ let make_args srv =
        | Some crt, Some key -> Some { crt; key }
        | _, _ -> None
      in
-     srv { port; tls; verbose }
+     srv App.{ verbose; port; tls }
   ]
 
 let make_command srv =
@@ -28,6 +29,6 @@ let make_command srv =
 
 let () =
   Dotenv.export ();
-  Server.start
+  App.start
   |> make_command
   |> Command.run

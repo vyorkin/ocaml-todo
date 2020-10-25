@@ -26,3 +26,5 @@ val send_close : reason:string -> t -> unit Lwt.t
 val set_connected : t -> unit
 
 val set_disconnected : t -> unit
+
+val to_string : t -> string
