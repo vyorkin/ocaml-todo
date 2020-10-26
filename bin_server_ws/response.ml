@@ -59,6 +59,7 @@ let json_opt encode data client =
   | Some data -> json encode data client
 
 let json_list encode list client =
+  (** TODO: Serialize to a JSON array *)
   let messages = List.map ~f:(message encode Status.Ok) list in
   respond_multi messages client
 
