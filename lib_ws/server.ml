@@ -67,8 +67,7 @@ let rec loop ~handlers srv client =
     match frame.opcode with
     | Opcode.Ping ->
        Client.send_pong client
-    | Opcode.Text
-    | Opcode.Binary ->
+    | Opcode.Text | Opcode.Binary ->
        let message = frame.content in
        Logs.app ~src (fun m -> m "[RECV] %d: %s" id message);
        let* () = handlers.on_message ~message client in

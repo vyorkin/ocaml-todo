@@ -62,10 +62,6 @@ let send_close ~reason client =
   then send_close_reason ~reason client
   else send_close_normal client
 
-let set_connected client =
-  Logs.app ~src (fun m -> m "[CONNECTED] %d" client.id);
-  client.status := Connected
-
 let set_disconnected client =
   Logs.app ~src (fun m -> m "[DISCONNECTED] %d" client.id);
   client.status := Disconnected
