@@ -1,0 +1,6 @@
+(executable
+ (name todo_chat_ws)
+ (libraries todo_base todo_ws core websocket-lwt-unix websocket-lwt-unix.cohttp dotenv fmt
+   logs logs.lwt logs.fmt)
+ (preprocess
+  (pps ppx_let lwt_ppx ppx_deriving.show)))
