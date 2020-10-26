@@ -1,16 +1,13 @@
-open Todo_ws
-
-(** Represents a request handler. *)
-type t = Server.t * Client.t -> unit Lwt.t
-
 module Todo: sig
-  val list : t
+  open Endpoint
 
-  val show : id:string -> t
+  val index : handler
 
-  val create : data:string -> t
+  val show : handler
 
-  val update : id:string -> data:string -> t
+  val create : handler
 
-  val delete : id:string -> t
+  val update : handler
+
+  val delete : handler
 end

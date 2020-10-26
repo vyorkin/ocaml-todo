@@ -1,37 +1,25 @@
 open Todo_ws
 
-(** Represents a websocket server endpoint. *)
-type t = Client.t -> string list -> unit Lwt.t
+type handler = string list -> Client.t -> unit Lwt.t
 
-(** General handler of websocket request. *)
-val handle :
-  of_string:(string -> 'a Lwt.t) ->
-  to_string:('b -> string) ->
-  ('a -> ('b, 'c) result Lwt.t) ->
-  Client.t ->
-  t
+type 'a decoder = string -> 'a
+type 'b encoder = 'b -> string
 
-val show :
-  ('a -> string) ->
-  (int -> ('a option, 'c) Lwt_result.t) ->
-  t
+type 'a input = string list -> 'a
+type 'b output = 'b -> Client.t -> unit Lwt.t
 
-val index :
-  ('a -> string) ->
-  (unit -> ('a list, 'c) Lwt_result.t) ->
-  t
+type ('a, 'b) io = 'a input * 'b output
+type ('a, 'b) codec = 'a decoder * 'b encoder
+type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
-val create :
-  (string -> 'a) ->
-  ('b -> string) ->
-  ('a -> ('b, 'c) Lwt_result.t) ->
-  t
+val handle : ('a, 'b) io -> ('a, 'b, 'c) query -> handler
 
-val update :
-  (string -> 'a) ->
-  ('b -> string) ->
-  (int * 'a -> 'c) ->
-  ('a -> ('b, 'c) Lwt_result.t) ->
-  t
+val show : 'b encoder -> (int, 'b option, 'c) query -> handler
 
-val delete : (int -> (unit, string) Lwt_result.t) -> t
+val index : 'b encoder -> (unit, 'b list, 'c) query -> handler
+
+val create : ('a, 'b) codec -> ('a, 'b, 'c) query -> handler
+
+val update : ('a, 'b) codec -> (int * 'a -> 'c) -> ('c, 'b, 'd) query -> handler
+
+val delete : (int, unit, string) query -> handler

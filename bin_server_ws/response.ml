@@ -30,22 +30,38 @@ let serialize (status, content) =
   let body = serialize_content content in
   code ^ body
 
+let message encode status text =
+  (status, Some (encode text))
+
 let respond data client =
   data
+  |> serialize
+  |> Client.send client
+
+let respond_multi list client =
+  list
   |> List.map ~f:serialize
   |> Client.send_multiple client
 
-let json ?(status = Status.Ok) client to_json data =
-  let to_message x = (status, Some (x |> to_json |> Yojson.Safe.to_string)) in
-  let messages = List.map ~f:to_message data in
-  respond messages client
-
-let no_content =
-  respond [ (Status.No_content, None) ]
+let no_content () =
+  respond (Status.No_content, None)
 
 let not_found =
-  respond [ (Status.Not_found, None) ]
+  respond (Status.Not_found, None)
+
+let json encode data client =
+  let msg = message encode Status.Ok data in
+  respond msg client
+
+let json_opt encode data client =
+  match data with
+  | None -> not_found client
+  | Some data -> json encode data client
+
+let json_list encode list client =
+  let messages = List.map ~f:(message encode Status.Ok) list in
+  respond_multi messages client
 
 let server_error =
   let desc = "Unexpected internal server error" in
-  respond [ (Status.Server_error, Some desc) ]
+  respond (Status.Server_error, Some desc)

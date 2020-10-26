@@ -1,38 +1,61 @@
-open Lwt.Syntax
+open Core_kernel
 open Todo_base
 open Todo_ws
 
-type t = Client.t -> string list -> unit Lwt.t
+type handler = string list -> Client.t -> unit Lwt.t
 
-let src =
-  Logs.Src.create "todo_server_ws.endpoint"
+type 'a decoder = string -> 'a
+type 'b encoder = 'b -> string
 
-let handle ~of_string ~to_string f content client =
+type 'a input = string list -> 'a
+type 'b output = 'b -> Client.t -> unit Lwt.t
+
+type ('a, 'b) io = 'a input * 'b output
+type ('a, 'b) codec = 'a decoder * 'b encoder
+type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
+
+module Param = struct
+  let unit _ = ()
+
+  let id = function
+    | s :: _ -> int_of_string s
+    | _ -> failwith "id parameter missing"
+
+  let json decode data =
+    data |> List.hd_exn |> decode
+
+  let id_json decode to_record list =
+    match list with
+    | s1 :: s2 :: _ ->
+       let id' = id [ s1 ] in
+       let data = json decode [ s2 ] in
+       to_record (id', data)
+    | _ -> failwith "id or json parameters are missing"
+end
+
+let handle (input, output) f data client =
   try
-    let* data = of_string content in
-    match%lwt f data with
-    | Ok result -> to_string result
+    let params = input data in
+    match%lwt f params with
+    | Ok result -> output result client
     | Error _ -> Response.server_error client
   with err ->
     Log.unhandled_error err;
     Response.server_error client
 
-let index of_string to_string =
-  Logs.app ~src (fun m -> m "[INDEX]");
-  handle
+let show encode =
+  handle (Param.id, Response.json_opt encode)
 
-let show _of_string _to_string _ _ =
-  Logs.app ~src (fun m -> m "[SHOW] %s" "id");
-  Lwt.return_unit
+let index encode =
+  handle (Param.unit, Response.json_list encode)
 
-let create _of_string _to_string _ _ =
-  Logs.app ~src (fun m -> m "[CREATE] %s" "data");
-  Lwt.return_unit
+let create (decode, encode) =
+  handle (Param.json decode, Response.json encode)
 
-let update _of_string _to_string _ _ _ =
-  Logs.app ~src (fun m -> m "[UPDATE] %s %s" "id" "data");
-  Lwt.return_unit
+let update (decode, encode) to_record =
+  let i = Param.id_json decode to_record in
+  let o = Response.json encode in
+  handle (i, o)
 
-let delete _of_string _to_string _ _ =
-  Logs.app ~src (fun m -> m "[DELETE] %s" "id");
-  Lwt.return_unit
+let delete =
+  handle (Param.id, Response.no_content)

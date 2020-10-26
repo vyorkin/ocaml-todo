@@ -19,18 +19,20 @@ end
 (** Response message. *)
 type message = Status.t * string option
 
-(** Respond with a given messages. *)
-val respond : message list -> Client.t -> unit Lwt.t
+(** Respond with a given message. *)
+val respond : message -> Client.t -> unit Lwt.t
 
-val json :
-  ?status:Status.t ->
-  Client.t ->
-  ('a -> Yojson.Safe.t) ->
-  'a list ->
-  unit Lwt.t
+(** Respond with multiple messages. *)
+val respond_multi : message list -> Client.t -> unit Lwt.t
 
-val no_content : Client.t -> unit Lwt.t
+val no_content : unit -> Client.t -> unit Lwt.t
 
 val not_found : Client.t -> unit Lwt.t
+
+val json : ('a -> string) -> 'a -> Client.t -> unit Lwt.t
+
+val json_opt : ('a -> string) -> 'a option -> Client.t -> unit Lwt.t
+
+val json_list : ('a -> string) -> 'a list -> Client.t -> unit Lwt.t
 
 val server_error : Client.t -> unit Lwt.t

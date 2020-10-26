@@ -1,23 +1,37 @@
-open Todo_ws
-
-type t = Server.t * Client.t -> unit Lwt.t
+open Core_kernel
+open Lwt.Syntax
 
 module Todo = struct
   module Model = Todo_model.Todo
   module Db = Todo_db.Todo
 
-  let list (_s, _c) =
-    Lwt.return_unit
+  let decode str =
+    str
+    |> Yojson.Safe.from_string
+    |> Model.of_yojson_exn
 
-  let show ~id:_ (_s, _c) =
-    Lwt.return_unit
+  let encode record =
+    record
+    |> Model.to_yojson
+    |> Yojson.Safe.to_string
 
-  let create ~data:_ (_s, _c) =
-    Lwt.return_unit
+  let codec = (decode, encode)
 
-  let update ~id:_ ~data:_ (_s, _c) =
-    Lwt.return_unit
+  let show =
+    Endpoint.show encode Db.find
 
-  let delete ~id:_ (_s, _c) =
-    Lwt.return_unit
+  let index =
+    Endpoint.index encode Db.all
+
+  let create =
+    Endpoint.create codec Db.create
+
+  let update =
+    Endpoint.update
+      codec
+      (fun (id, r) -> { r with id })
+      (fun r -> let+ r' = Db.update r in Result.map ~f:(Fn.const r) r')
+
+  let delete =
+    Endpoint.delete Db.destroy
 end

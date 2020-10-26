@@ -5,14 +5,14 @@ module Request = Opium.Std.Request
 
 type handler = Request.t -> Opium.Std.Response.t Lwt.t
 
-type 'a encoder = 'a -> Yojson.Safe.t
 type 'a decoder = Yojson.Safe.t -> 'a
+type 'b encoder = 'b -> Yojson.Safe.t
 
 type 'a input = Request.t -> 'a Lwt.t
-type 'a output = 'a -> Opium.Std.Response.t Lwt.t
+type 'b output = 'b -> Opium.Std.Response.t Lwt.t
 
 type ('a, 'b) io = 'a input * 'b output
-type ('a, 'b) codec = 'a encoder * 'b decoder
+type ('a, 'b) codec = 'a decoder * 'b encoder
 type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
 module Param = struct
@@ -23,13 +23,13 @@ module Param = struct
   let id (req: Request.t) =
     "id" |> Router.param req |> int_of_string |> Lwt.return
 
-  let json of_json (req: Request.t) =
+  let json decode (req: Request.t) =
     let+ json = Request.to_json_exn req in
-    of_json json
+    decode json
 
-  let id_json of_json to_record (req: Request.t) =
-    let* id = id req in
-    let* data = json of_json req in
+  let id_json decode to_record (req: Request.t) =
+    let* id = id req
+    and* data = json decode req in
     Lwt.return @@ to_record (id, data)
 end
 
@@ -43,17 +43,19 @@ let handle (input, output) f (req: Request.t) =
     Log.unhandled_error err;
     Response.server_error ()
 
-let show to_json =
-  handle (Param.id, Response.json_opt to_json)
+let show encode =
+  handle (Param.id, Response.json_opt encode)
 
-let index to_json =
-  handle (Param.unit, Response.json_list to_json)
+let index encode =
+  handle (Param.unit, Response.json_list encode)
 
-let create of_json to_json =
-  handle (Param.json of_json, Response.json to_json)
+let create (decode, encode) =
+  handle (Param.json decode, Response.json encode)
 
-let update of_json to_json to_record =
-  handle (Param.id_json of_json to_record, Response.json to_json)
+let update (decode, encode) to_record =
+  let input = Param.id_json decode to_record in
+  let output = Response.json encode in
+  handle (input, output)
 
 let delete =
   handle (Param.id, Response.no_content)
