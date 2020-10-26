@@ -5,10 +5,20 @@ type t = Client.t -> string list -> unit Lwt.t
 
 (** General handler of websocket request. *)
 val handle :
-  of_json:(string -> 'a Lwt.t) ->
-  to_json:('b -> string) ->
+  of_string:(string -> 'a Lwt.t) ->
+  to_string:('b -> string) ->
   ('a -> ('b, 'c) result Lwt.t) ->
   Client.t ->
+  t
+
+val show :
+  ('a -> Yojson.Safe.t) ->
+  (int -> ('a option, 'c) Lwt_result.t) ->
+  t
+
+val index :
+  ('a -> Yojson.Safe.t) ->
+  (unit -> ('a list, 'c) Lwt_result.t) ->
   t
 
 val create :
@@ -25,13 +35,3 @@ val update :
   t
 
 val delete : (int -> (unit, string) Lwt_result.t) -> t
-
-val show :
-  ('a -> Yojson.Safe.t) ->
-  (int -> ('a option, 'c) Lwt_result.t) ->
-  t
-
-val index :
-  ('a -> Yojson.Safe.t) ->
-  (unit -> ('a list, 'c) Lwt_result.t) ->
-  t
