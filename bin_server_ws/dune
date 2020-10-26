@@ -3,4 +3,4 @@
  (libraries todo_base todo_model todo_db todo_ws core websocket-lwt-unix websocket-lwt-unix.cohttp dotenv fmt
    logs logs.lwt logs.fmt)
  (preprocess
-  (pps ppx_let lwt_ppx ppx_deriving.show)))
+  (pps ppx_let lwt_ppx ppx_deriving.show ppx_deriving.enum)))

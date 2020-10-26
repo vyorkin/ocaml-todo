@@ -1,4 +1,4 @@
-(** Represents a websocket server. *)
+(** Represents a websocket server state. *)
 type t
 
 (** TLS connection settings. *)

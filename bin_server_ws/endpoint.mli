@@ -1,13 +1,14 @@
-open Opium.Std
+open Todo_ws
 
-module Response := Opium.Std.Response
+(** Represents a websocket server endpoint. *)
+type t = Client.t -> string list -> unit Lwt.t
 
-type t = Request.t -> Response.t Lwt.t
-
+(** General handler of websocket request. *)
 val handle :
-  input:(Request.t -> 'a Lwt.t) ->
-  output:('b -> Response.t Lwt.t) ->
+  of_json:(string -> 'a Lwt.t) ->
+  to_json:('b -> string) ->
   ('a -> ('b, 'c) result Lwt.t) ->
+  Client.t ->
   t
 
 val create :
@@ -20,7 +21,7 @@ val update :
   (Yojson.Safe.t -> 'a) ->
   ('b -> Yojson.Safe.t) ->
   (int * 'a -> 'c) ->
-  ('c -> ('b, 'd) Lwt_result.t) ->
+  ('a -> ('b, 'c) Lwt_result.t) ->
   t
 
 val delete : (int -> (unit, string) Lwt_result.t) -> t

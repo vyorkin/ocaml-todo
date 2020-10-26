@@ -15,20 +15,21 @@ let init ~verbose =
   let reporter = Log.make_reporter ~verbose in
   Logs.set_reporter reporter
 
-let handle ~message s c =
+let handle ~message server client =
+  let module Handler = Handler.Todo in
   Logs.app ~src (fun m -> m "[ON_MESSAGE] %s" message);
   match String.split ~on:'|' message with
   | [ "list" ] ->
-     Handler.Todo.list (s, c)
+     Handler.list (server, client)
   | "show" :: id :: _ ->
-     Handler.Todo.show ~id (s, c)
+     Handler.show ~id (server, client)
   | "create" :: data :: _ ->
-     Handler.Todo.create ~data (s, c)
+     Handler.create ~data (server, client)
   | "update" :: id :: data :: _ ->
-     Handler.Todo.update ~id ~data (s, c)
+     Handler.update ~id ~data (server, client)
   | "delete" :: id :: _ ->
-     Handler.Todo.delete ~id (s, c)
-  | _ -> Handler.unknown (s, c)
+     Handler.delete ~id (server, client)
+  | _ -> Response.not_found client
 
 let on_connect _client =
   Logs.app ~src (fun m -> m "[ON_CONNECT]");

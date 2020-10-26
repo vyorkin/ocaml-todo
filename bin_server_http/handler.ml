@@ -1,3 +1,6 @@
+open Core_kernel
+open Lwt.Syntax
+
 module Todo = struct
   module Model = Todo_model.Todo
   module Endpoint = Todo_http.Endpoint
@@ -10,8 +13,6 @@ module Todo = struct
       Db.create
 
   let update =
-    let open Lwt.Syntax in
-    let open Core_kernel in
     Endpoint.update
       Model.of_yojson_exn
       Model.to_yojson

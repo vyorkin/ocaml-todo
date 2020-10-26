@@ -1,34 +1,23 @@
+open Todo_ws
+
+type t = Server.t * Client.t -> unit Lwt.t
+
 module Todo = struct
   module Model = Todo_model.Todo
   module Db = Todo_db.Todo
 
-  let src =
-    Logs.Src.create "todo_server_ws.handler.todo"
-
   let list (_s, _c) =
-    Logs.app ~src (fun m -> m "[LIST]");
     Lwt.return_unit
 
-  let show ~id (_s, _c) =
-    Logs.app ~src (fun m -> m "[SHOW] %s" id);
+  let show ~id:_ (_s, _c) =
     Lwt.return_unit
 
-  let create ~data (_s, _c) =
-    Logs.app ~src (fun m -> m "[CREATE] %s" data);
+  let create ~data:_ (_s, _c) =
     Lwt.return_unit
 
-  let update ~id ~data (_s, _c) =
-    Logs.app ~src (fun m -> m "[UPDATE] %s %s" id data);
+  let update ~id:_ ~data:_ (_s, _c) =
     Lwt.return_unit
 
-  let delete ~id (_s, _c) =
-    Logs.app ~src (fun m -> m "[DELTE] %s" id);
+  let delete ~id:_ (_s, _c) =
     Lwt.return_unit
 end
-
-let src =
-  Logs.Src.create "todo_server_ws.handler"
-
-let unknown (_s, _c) =
-  Logs.app ~src (fun m -> m "[UNKNOWN]");
-  Lwt.return_unit
