@@ -9,6 +9,9 @@ http-server:
 ws-server:
 	dune exe ./bin_server_ws/todo_server_ws.exe
 
+ws-server-chat:
+	dune exe ./bin_server_ws/todo_chat_ws.exe
+
 test:
 	dune exe ./test/testsuite.exe
 
