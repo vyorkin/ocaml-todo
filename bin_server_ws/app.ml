@@ -15,48 +15,20 @@ let init ~verbose =
   let reporter = Log.make_reporter ~verbose in
   Logs.set_reporter reporter
 
-let list ~server ~client =
-  server
-  |> Server.clients
-  |> List.map ~f:Client.to_string
-  |> String.concat ~sep:", "
-  |> Printf.sprintf "online: %s"
-  |> Client.send client
-
-let send ~server ~client (target_id, content) =
-  let target =
-    match int_of_string_opt target_id with
-    | Some id -> Server.find server id
-    | None -> None
-  in
-  match target with
-  | None ->
-     target_id
-     |> Printf.sprintf "User with id %s not found"
-     |> Client.send client
-  | Some target ->
-     let id = Client.to_string client in
-     let text = String.concat ~sep:" " content in
-     let message = Printf.sprintf "Message from %s: %s" id text in
-     Client.send target message
-
-let broadcast ~server ~client content =
-  let id = Client.to_string client in
-  let text = String.concat ~sep:" " content in
-  let msg = Printf.sprintf "%s: %s" id text in
-  Server.broadcast_to_others server client msg
-
-let handle ~message server client =
+let handle ~message s c =
   Logs.app ~src (fun m -> m "[ON_MESSAGE] %s" message);
-  match String.split ~on:' ' message with
-  | [ "/list" ] ->
-     list ~server ~client
-  | [ "/quit" ] ->
-     Server.close server client
-  | "/msg" :: id :: text ->
-     send ~server ~client (id, text)
-  | content ->
-     broadcast ~server ~client content
+  match String.split ~on:'|' message with
+  | [ "list" ] ->
+     Handler.Todo.list (s, c)
+  | "show" :: id :: _ ->
+     Handler.Todo.show ~id (s, c)
+  | "create" :: data :: _ ->
+     Handler.Todo.create ~data (s, c)
+  | "update" :: id :: data :: _ ->
+     Handler.Todo.update ~id ~data (s, c)
+  | "delete" :: id :: _ ->
+     Handler.Todo.delete ~id (s, c)
+  | _ -> Handler.unknown (s, c)
 
 let on_connect _client =
   Logs.app ~src (fun m -> m "[ON_CONNECT]");
