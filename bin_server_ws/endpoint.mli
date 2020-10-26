@@ -12,24 +12,24 @@ val handle :
   t
 
 val show :
-  ('a -> Yojson.Safe.t) ->
+  ('a -> string) ->
   (int -> ('a option, 'c) Lwt_result.t) ->
   t
 
 val index :
-  ('a -> Yojson.Safe.t) ->
+  ('a -> string) ->
   (unit -> ('a list, 'c) Lwt_result.t) ->
   t
 
 val create :
-  (Yojson.Safe.t -> 'a) ->
-  ('b -> Yojson.Safe.t) ->
+  (string -> 'a) ->
+  ('b -> string) ->
   ('a -> ('b, 'c) Lwt_result.t) ->
   t
 
 val update :
-  (Yojson.Safe.t -> 'a) ->
-  ('b -> Yojson.Safe.t) ->
+  (string -> 'a) ->
+  ('b -> string) ->
   (int * 'a -> 'c) ->
   ('a -> ('b, 'c) Lwt_result.t) ->
   t

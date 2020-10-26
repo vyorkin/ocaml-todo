@@ -3,7 +3,17 @@ open Todo_base
 
 module Request = Opium.Std.Request
 
-type t = Request.t -> Opium.Std.Response.t Lwt.t
+type handler = Request.t -> Opium.Std.Response.t Lwt.t
+
+type 'a encoder = 'a -> Yojson.Safe.t
+type 'a decoder = Yojson.Safe.t -> 'a
+
+type 'a input = Request.t -> 'a Lwt.t
+type 'a output = 'a -> Opium.Std.Response.t Lwt.t
+
+type ('a, 'b) io = 'a input * 'b output
+type ('a, 'b) codec = 'a encoder * 'b decoder
+type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
 module Param = struct
   open Opium.Std
@@ -23,7 +33,7 @@ module Param = struct
     Lwt.return @@ to_record (id, data)
 end
 
-let handle ~input ~output f (req: Request.t) =
+let handle (input, output) f (req: Request.t) =
   try
     let* data = input req in
     match%lwt f data with
@@ -33,27 +43,17 @@ let handle ~input ~output f (req: Request.t) =
     Log.unhandled_error err;
     Response.server_error ()
 
-let create of_json to_json =
-  handle
-    ~input:(Param.json of_json)
-    ~output:(Response.json to_json)
-
-let update of_json to_json to_record =
-  handle
-    ~input:(Param.id_json of_json to_record)
-    ~output:(Response.json to_json)
-
-let delete =
-  handle
-    ~input:Param.id
-    ~output:Response.no_content
-
 let show to_json =
-  handle
-    ~input:Param.id
-    ~output:(Response.json_opt to_json)
+  handle (Param.id, Response.json_opt to_json)
 
 let index to_json =
-  handle
-    ~input:Param.unit
-    ~output:(Response.json_list to_json)
+  handle (Param.unit, Response.json_list to_json)
+
+let create of_json to_json =
+  handle (Param.json of_json, Response.json to_json)
+
+let update of_json to_json to_record =
+  handle (Param.id_json of_json to_record, Response.json to_json)
+
+let delete =
+  handle (Param.id, Response.no_content)

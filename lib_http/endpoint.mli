@@ -2,35 +2,26 @@ open Opium.Std
 
 module Response := Opium.Std.Response
 
-type t = Request.t -> Response.t Lwt.t
+type handler = Request.t -> Response.t Lwt.t
 
-val handle :
-  input:(Request.t -> 'a Lwt.t) ->
-  output:('b -> Response.t Lwt.t) ->
-  ('a -> ('b, 'c) result Lwt.t) ->
-  t
+type 'a encoder = 'a -> Yojson.Safe.t
+type 'a decoder = Yojson.Safe.t -> 'a
 
-val create :
-  (Yojson.Safe.t -> 'a) ->
-  ('b -> Yojson.Safe.t) ->
-  ('a -> ('b, 'c) Lwt_result.t) ->
-  t
+type 'a input = Request.t -> 'a Lwt.t
+type 'a output = 'a -> Response.t Lwt.t
 
-val update :
-  (Yojson.Safe.t -> 'a) ->
-  ('b -> Yojson.Safe.t) ->
-  (int * 'a -> 'c) ->
-  ('c -> ('b, 'd) Lwt_result.t) ->
-  t
+type ('a, 'b) io = 'a input * 'b output
+type ('a, 'b) codec = 'a encoder * 'b decoder
+type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
-val delete : (int -> (unit, string) Lwt_result.t) -> t
+val handle : ('a, 'b) io -> ('a, 'b, 'c) query -> handler
 
-val show :
-  ('a -> Yojson.Safe.t) ->
-  (int -> ('a option, 'c) Lwt_result.t) ->
-  t
+val show : 'a encoder -> (int, 'a option, 'b) query -> handler
 
-val index :
-  ('a -> Yojson.Safe.t) ->
-  (unit -> ('a list, 'c) Lwt_result.t) ->
-  t
+val index : 'a encoder -> (unit, 'a list, 'c) query -> handler
+
+val create : ('a, 'b) codec -> ('a, 'b, 'c) query -> handler
+
+val update : ('a, 'b) codec -> (int * 'a -> 'c) -> ('c, 'b, 'd) query -> handler
+
+val delete : (int, unit, string) query -> handler
