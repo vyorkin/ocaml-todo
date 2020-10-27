@@ -30,10 +30,10 @@ let show encode =
 let index encode =
   handle (Param.unit, Response.json_list encode)
 
-let create ((decode, encode) : ('a, 'b) codec) (query : ('a, 'b, 'c) query) (l : string list) (c : Client.t) : unit Lwt.t =
+let create (decode, encode) =
   let i = Param.json decode in
   let o = Response.json ~status:Status.Created encode in
-  handle (i, o) query l c
+  handle (i, o)
 
 let update (decode, encode) to_record =
   let i = Param.id_json decode to_record in
