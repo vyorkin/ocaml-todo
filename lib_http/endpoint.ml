@@ -3,7 +3,7 @@ open Todo_base
 
 module Request = Opium.Std.Request
 
-type handler = Request.t -> Opium.Std.Response.t Lwt.t
+type t = Request.t -> Opium.Std.Response.t Lwt.t
 
 type 'a decoder = Yojson.Safe.t -> 'a
 type 'b encoder = 'b -> Yojson.Safe.t
@@ -35,9 +35,9 @@ let create (decode, encode) =
   handle (Param.json decode, Response.json encode)
 
 let update (decode, encode) to_record =
-  let input = Param.id_json decode to_record in
-  let output = Response.json encode in
-  handle (input, output)
+  let i = Param.id_json decode to_record in
+  let o = Response.json encode in
+  handle (i, o)
 
 let delete =
   handle (Param.id, Response.no_content)

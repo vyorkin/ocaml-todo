@@ -1,13 +1,13 @@
 module Todo: sig
   open Endpoint
 
-  val index : handler
+  val index : t
 
-  val show : handler
+  val show : t
 
-  val create : handler
+  val create : t
 
-  val update : handler
+  val update : t
 
-  val delete : handler
+  val delete : t
 end

@@ -7,7 +7,7 @@ let id = function
   | _ -> failwith "id parameter missing"
 
 let json decode data =
-  data |> List.hd_exn |> decode
+  data |> List.hd_exn |> Yojson.Safe.from_string |> decode
 
 let id_json decode to_record list =
   match list with

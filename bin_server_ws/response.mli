@@ -1,38 +1,26 @@
 open Todo_ws
 
-module Status: sig
-  (** Websocket server response status codes.
-      Here we use status codes similar to those in HTTP. *)
-  type t =
-    | Ok
-    | Created
-    | No_content
-    | Bad_request
-    | Unauthorized
-    | Forbidden
-    | Not_found
-    | Server_error
-    | Not_implemented
-    [@@deriving show, enum]
-end
+type 'a encoder = 'a -> Yojson.Safe.t
 
-(** Response message. *)
-type message = Status.t * string option
+type handler = Client.t -> unit Lwt.t
 
-(** Respond with a given message. *)
-val respond : message -> Client.t -> unit Lwt.t
+(** Response JSON message. *)
+type json = Status.t * Yojson.Safe.t option
 
-(** Respond with multiple messages. *)
-val respond_multi : message list -> Client.t -> unit Lwt.t
+(** Respond with a given JSON message. *)
+val respond_json : json -> handler
 
-val no_content : unit -> Client.t -> unit Lwt.t
+(** Respond with multiple JSON messages. *)
+val respond_json_multi : json list -> handler
 
-val not_found : Client.t -> unit Lwt.t
+val no_content : unit -> handler
 
-val json : ?status:Status.t -> ('a -> string) -> 'a -> Client.t -> unit Lwt.t
+val not_found : handler
 
-val json_opt : ?status:Status.t -> ('a -> string) -> 'a option -> Client.t -> unit Lwt.t
+val json : ?status:Status.t -> 'a encoder -> 'a -> handler
 
-val json_list : ?status:Status.t -> ('a -> string) -> 'a list -> Client.t -> unit Lwt.t
+val json_opt : ?status:Status.t -> 'a encoder -> 'a option -> handler
 
-val server_error : Client.t -> unit Lwt.t
+val json_list : ?status:Status.t -> 'a encoder -> 'a list -> handler
+
+val server_error : handler

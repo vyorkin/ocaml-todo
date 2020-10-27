@@ -2,10 +2,10 @@ open Core_kernel
 open Todo_base
 open Todo_ws
 
-type handler = string list -> Client.t -> unit Lwt.t
+type t = string list -> Client.t -> unit Lwt.t
 
-type 'a decoder = string -> 'a
-type 'b encoder = 'b -> string
+type 'a decoder = Yojson.Safe.t -> 'a
+type 'b encoder = 'b -> Yojson.Safe.t
 
 type 'a input = string list -> 'a
 type 'b output = 'b -> Client.t -> unit Lwt.t
@@ -30,8 +30,10 @@ let show encode =
 let index encode =
   handle (Param.unit, Response.json_list encode)
 
-let create (decode, encode) =
-  handle (Param.json decode, Response.json encode)
+let create ((decode, encode) : ('a, 'b) codec) (query : ('a, 'b, 'c) query) (l : string list) (c : Client.t) : unit Lwt.t =
+  let i = Param.json decode in
+  let o = Response.json ~status:Status.Created encode in
+  handle (i, o) query l c
 
 let update (decode, encode) to_record =
   let i = Param.id_json decode to_record in

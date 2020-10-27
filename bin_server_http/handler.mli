@@ -2,17 +2,17 @@ open Todo_http
 
 module Todo: sig
   (** POST /todo *)
-  val create : Endpoint.handler
+  val create : Endpoint.t
 
   (** PUT /todo/:id *)
-  val update : Endpoint.handler
+  val update : Endpoint.t
 
   (** DELETE /todo/:id *)
-  val delete : Endpoint.handler
+  val delete : Endpoint.t
 
   (** GET /todo/:id *)
-  val show : Endpoint.handler
+  val show : Endpoint.t
 
   (** GET /todo *)
-  val index : Endpoint.handler
+  val index : Endpoint.t
 end
