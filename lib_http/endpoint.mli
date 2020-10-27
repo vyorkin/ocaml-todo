@@ -1,7 +1,5 @@
 open Opium.Std
 
-module Response := Opium.Std.Response
-
 type handler = Request.t -> Response.t Lwt.t
 
 type 'a decoder = Yojson.Safe.t -> 'a

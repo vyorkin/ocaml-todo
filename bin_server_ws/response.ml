@@ -49,18 +49,18 @@ let no_content () =
 let not_found =
   respond (Status.Not_found, None)
 
-let json encode data client =
-  let msg = message encode Status.Ok data in
+let json ?(status = Status.Ok) encode data client =
+  let msg = message encode status data in
   respond msg client
 
-let json_opt encode data client =
+let json_opt ?(status = Status.Ok) encode data client =
   match data with
   | None -> not_found client
-  | Some data -> json encode data client
+  | Some data -> json ~status encode data client
 
-let json_list encode list client =
+let json_list ?(status = Status.Ok) encode list client =
   (** TODO: Serialize to a JSON array *)
-  let messages = List.map ~f:(message encode Status.Ok) list in
+  let messages = List.map ~f:(message encode status) list in
   respond_multi messages client
 
 let server_error =

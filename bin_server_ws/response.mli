@@ -29,10 +29,10 @@ val no_content : unit -> Client.t -> unit Lwt.t
 
 val not_found : Client.t -> unit Lwt.t
 
-val json : ('a -> string) -> 'a -> Client.t -> unit Lwt.t
+val json : ?status:Status.t -> ('a -> string) -> 'a -> Client.t -> unit Lwt.t
 
-val json_opt : ('a -> string) -> 'a option -> Client.t -> unit Lwt.t
+val json_opt : ?status:Status.t -> ('a -> string) -> 'a option -> Client.t -> unit Lwt.t
 
-val json_list : ('a -> string) -> 'a list -> Client.t -> unit Lwt.t
+val json_list : ?status:Status.t -> ('a -> string) -> 'a list -> Client.t -> unit Lwt.t
 
 val server_error : Client.t -> unit Lwt.t

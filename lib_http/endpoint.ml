@@ -15,24 +15,6 @@ type ('a, 'b) io = 'a input * 'b output
 type ('a, 'b) codec = 'a decoder * 'b encoder
 type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
-module Param = struct
-  open Opium.Std
-
-  let unit _ = Lwt.return ()
-
-  let id (req: Request.t) =
-    "id" |> Router.param req |> int_of_string |> Lwt.return
-
-  let json decode (req: Request.t) =
-    let+ json = Request.to_json_exn req in
-    decode json
-
-  let id_json decode to_record (req: Request.t) =
-    let* id = id req
-    and* data = json decode req in
-    Lwt.return @@ to_record (id, data)
-end
-
 let handle (input, output) f (req: Request.t) =
   try
     let* data = input req in
