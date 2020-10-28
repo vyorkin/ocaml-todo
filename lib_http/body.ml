@@ -18,4 +18,7 @@ let to_opium = function
      |> Body.of_string
 
 let to_response ?headers ?status body =
-  Response.make ?headers ?status ~body:(to_opium body) () |> Lwt.return
+  let body = to_opium body in
+  ()
+  |> Response.make ?headers ?status ~body
+  |> Lwt.return

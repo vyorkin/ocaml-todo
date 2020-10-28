@@ -1,7 +1,5 @@
 open Opium_kernel
 
-module Response := Opium.Std.Response
-
 (** Creates a "204 No Content" HTTP response. *)
 val no_content : unit -> Response.t Lwt.t
 

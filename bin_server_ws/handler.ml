@@ -5,15 +5,9 @@ module Todo = struct
   module Model = Todo_model.Todo
   module Db = Todo_db.Todo
 
-  let decode str =
-    str
-    |> Yojson.Safe.from_string
-    |> Model.of_yojson_exn
+  let decode = Model.of_yojson_exn
 
-  let encode record =
-    record
-    |> Model.to_yojson
-    |> Yojson.Safe.to_string
+  let encode = Model.to_yojson
 
   let codec = (decode, encode)
 

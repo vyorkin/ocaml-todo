@@ -1,68 +1,50 @@
 open Core_kernel
 open Todo_ws
 
-module Status = struct
-  type t =
-    | Ok [@value 200]
-    | Created [@value 201]
-    | No_content [@value 204]
-    | Bad_request [@value 400]
-    | Unauthorized [@value 401]
-    | Forbidden [@value 403]
-    | Not_found [@value 404]
-    | Server_error [@value 500]
-    | Not_implemented [@value 501]
-    [@@deriving show, enum]
+type 'a encoder = 'a -> Yojson.Safe.t
 
-  let serialize status =
-    string_of_int @@ to_enum status
-end
+type handler = Client.t -> unit Lwt.t
 
-type message = Status.t * string option
+type json = Status.t * Yojson.Safe.t option
 
-let serialize_content content =
-  content
-  |> Option.map ~f:(fun s -> "|" ^ s)
+let serialize_json json =
+  json
+  |> Option.map ~f:(fun s -> "|" ^ Yojson.Safe.to_string s)
   |> Option.value ~default:""
 
-let serialize (status, content) =
-  let code = Status.serialize status in
-  let body = serialize_content content in
+let serialize (status, json) =
+  let code = Status.to_string status in
+  let body = serialize_json json in
   code ^ body
 
-let message encode status text =
-  (status, Some (encode text))
-
-let respond data client =
-  data
+let respond_json messsage client =
+  messsage
   |> serialize
   |> Client.send client
 
-let respond_multi list client =
-  list
+let respond_json_multi messages client =
+  messages
   |> List.map ~f:serialize
   |> Client.send_multiple client
 
 let no_content () =
-  respond (Status.No_content, None)
+  respond_json (Status.No_content, None)
 
 let not_found =
-  respond (Status.Not_found, None)
+  respond_json (Status.Not_found, None)
 
-let json encode data client =
-  let msg = message encode Status.Ok data in
-  respond msg client
+let json ?(status = Status.Ok) encode data =
+  respond_json (status, Some (encode data))
 
-let json_opt encode data client =
+let json_opt ?(status = Status.Ok) encode data client =
   match data with
   | None -> not_found client
-  | Some data -> json encode data client
+  | Some data -> json ~status encode data client
 
-let json_list encode list client =
-  (** TODO: Serialize to a JSON array *)
-  let messages = List.map ~f:(message encode Status.Ok) list in
-  respond_multi messages client
+let json_list ?(status = Status.Ok) encode list =
+  let data = List.map ~f:encode list in
+  respond_json (status, Some (`List data))
 
 let server_error =
   let desc = "Unexpected internal server error" in
-  respond (Status.Server_error, Some desc)
+  respond_json (Status.Server_error, Some (`String desc))

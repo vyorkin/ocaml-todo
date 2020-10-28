@@ -2,10 +2,10 @@ open Core_kernel
 open Todo_base
 open Todo_ws
 
-type handler = string list -> Client.t -> unit Lwt.t
+type t = string list -> Client.t -> unit Lwt.t
 
-type 'a decoder = string -> 'a
-type 'b encoder = 'b -> string
+type 'a decoder = Yojson.Safe.t -> 'a
+type 'b encoder = 'b -> Yojson.Safe.t
 
 type 'a input = string list -> 'a
 type 'b output = 'b -> Client.t -> unit Lwt.t
@@ -13,25 +13,6 @@ type 'b output = 'b -> Client.t -> unit Lwt.t
 type ('a, 'b) io = 'a input * 'b output
 type ('a, 'b) codec = 'a decoder * 'b encoder
 type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
-
-module Param = struct
-  let unit _ = ()
-
-  let id = function
-    | s :: _ -> int_of_string s
-    | _ -> failwith "id parameter missing"
-
-  let json decode data =
-    data |> List.hd_exn |> decode
-
-  let id_json decode to_record list =
-    match list with
-    | s1 :: s2 :: _ ->
-       let id' = id [ s1 ] in
-       let data = json decode [ s2 ] in
-       to_record (id', data)
-    | _ -> failwith "id or json parameters are missing"
-end
 
 let handle (input, output) f data client =
   try
@@ -50,7 +31,9 @@ let index encode =
   handle (Param.unit, Response.json_list encode)
 
 let create (decode, encode) =
-  handle (Param.json decode, Response.json encode)
+  let i = Param.json decode in
+  let o = Response.json ~status:Status.Created encode in
+  handle (i, o)
 
 let update (decode, encode) to_record =
   let i = Param.id_json decode to_record in
