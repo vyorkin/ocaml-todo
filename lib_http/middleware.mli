@@ -4,4 +4,4 @@ open Opium.Std
 val logging : Rock.Middleware.t
 
 (** Metrics middleware. *)
-val metrics : Rock.Middleware.t
+(* val metrics : Rock.Middleware.t *)

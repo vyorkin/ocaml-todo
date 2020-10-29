@@ -1,10 +1,12 @@
 open Prometheus
 
+module H = DefaultHistogram
+
+module Ws = struct
+  let namespace = "todo.ws"
+end
 
 module Http = struct
-  (** TODO: use functor instead *)
-  module H = DefaultHistogram
-
   let namespace = "todo.http"
 
   let label_names =

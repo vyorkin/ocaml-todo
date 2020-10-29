@@ -15,7 +15,7 @@ let logging =
   in
   Rock.Middleware.create ~name:"Logging" ~filter
 
-let metrics =
+(* let metrics = *)
   (* TODO: Continue from here *)
   (* let ... in *)
-  Rock.Middleware.create ~name:"Logging" ~filter
+  (* Rock.Middleware.create ~name:"Logging" ~filter *)
