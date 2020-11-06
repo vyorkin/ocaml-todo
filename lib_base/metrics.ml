@@ -2,9 +2,9 @@ open Prometheus
 
 module H = DefaultHistogram
 
-module Ws = struct
-  let namespace = "todo.ws"
-end
+(* module Ws = struct
+ *   let namespace = "todo.ws"
+ * end *)
 
 module Http = struct
   let namespace = "todo.http"
@@ -43,12 +43,15 @@ module Http = struct
   module Response = struct
     let subsystem = "response"
 
-    let size =
-      Counter.v_label
+    let size_labels =
+      H.v_labels
+        ~label_names
         ~help:"Size of HTTP response (bytes)"
-        ~label_name:"response"
         ~namespace
         ~subsystem
-        "response.size.bytes"
+        "size.bytes"
+
+    let size ~meth ~path =
+      H.labels size_labels [ meth; path ]
   end
 end
