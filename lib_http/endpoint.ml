@@ -17,6 +17,10 @@ type ('a, 'b, 'c) query = 'a -> ('b, 'c) result Lwt.t
 
 let handle (input, output) f (req: Request.t) =
   try
+    let size = Option.value req.body.length ~default:Int64.zero in
+    let meth = Httpaf.Method.to_string req.meth in
+    let size_metric = Metrics.Http.Request.size ~meth ~path:req.target in
+    Metrics.H.observe size_metric (Float.of_int size);
     let* data = input req in
     match%lwt f data with
     | Ok result -> output result

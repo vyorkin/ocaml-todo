@@ -2,18 +2,20 @@ open Prometheus
 
 module H = DefaultHistogram
 
-let namespace = "todo"
-
-module Ws = struct
-  let subsystem = "websocket"
-end
+(* module Ws = struct
+ *   let namespace = "todo.ws"
+ * end *)
 
 module Http = struct
+  let namespace = "todo.http"
+
   let label_names =
+    [ "method";
+      "path"
     ]
 
   module Request = struct
-    let subsystem = "http_request"
+    let subsystem = "request"
 
     let duration_labels =
       H.v_labels
@@ -21,7 +23,7 @@ module Http = struct
         ~help:"Duration of HTTP request (sec)"
         ~namespace
         ~subsystem
-        "duration_seconds"
+        "duration.seconds"
 
     let size_labels =
       H.v_labels
@@ -29,7 +31,7 @@ module Http = struct
         ~help:"Size of HTTP request (bytes)"
         ~namespace
         ~subsystem
-        "size_bytes"
+        "size.bytes"
 
     let duration ~meth ~path =
       H.labels duration_labels [ meth; path ]
@@ -39,14 +41,17 @@ module Http = struct
   end
 
   module Response = struct
-    let subsystem = "http_response"
+    let subsystem = "response"
 
-    let size =
-      Counter.v_label
+    let size_labels =
+      H.v_labels
+        ~label_names
         ~help:"Size of HTTP response (bytes)"
-        ~label_name:"response"
         ~namespace
         ~subsystem
-        "size_bytes"
+        "size.bytes"
+
+    let size ~meth ~path =
+      H.labels size_labels [ meth; path ]
   end
 end

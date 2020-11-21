@@ -25,6 +25,33 @@ type tls =
 let src =
   Logs.Src.create "lib_ws.server"
 
+module Handler = struct
+  open Websocket
+
+  let ping ~client =
+    Client.send_pong client
+
+  let message ~handlers ~client ~frame =
+    let open Frame in
+    let id = Client.id client in
+    let message = frame.content in
+    Logs.app ~src (fun m -> m "[RECV] %d: %s" id message);
+    handlers.on_message ~message client
+
+  let close ~handlers ~srv ~client ~frame =
+    let open Frame in
+    if Client.is_connected client then
+      Hashtbl.remove srv.clients (Client.id client);
+    let reason = frame.content in
+    let* () = Client.send_close ~reason client in
+    match handlers.on_close with
+    | Some f -> f ~reason client
+    | None -> Lwt.return_unit
+
+  let nop =
+    Lwt.return_unit
+end
+
 let select_mode ?tls ~port =
   match tls with
   | None ->
@@ -58,39 +85,32 @@ let next_client_id srv =
   Lwt_mutex.unlock srv.next_id_lock;
   client_id
 
+let exn_handler ~handlers ~srv ~client exn =
+  let err = Exn.to_string exn in
+  let id = Client.id client in
+  Logs.err ~src (fun m -> m "[RECV] %d: %s" id err);
+  Hashtbl.remove srv.clients id;
+  match handlers.on_error with
+  | Some f -> f ~exn client
+  | None -> Lwt.return_unit
+
 let rec loop ~handlers srv client =
   let open Websocket in
-  let id = Client.id client in
   let handle_msg () =
     let open Frame in
     let* frame = Client.receive client in
     match frame.opcode with
     | Opcode.Ping ->
-       Client.send_pong client
+       Handler.ping ~client
     | Opcode.Text | Opcode.Binary ->
-       let message = frame.content in
-       Logs.app ~src (fun m -> m "[RECV] %d: %s" id message);
-       let* () = handlers.on_message ~message client in
+       let* () = Handler.message ~handlers ~client ~frame in
        loop ~handlers srv client
     | Opcode.Close ->
-       if Client.is_connected client
-       then Hashtbl.remove srv.clients id;
-       let reason = frame.content in
-       let* () = Client.send_close ~reason client in
-       (match handlers.on_close with
-       | Some f -> f ~reason client
-       | None -> Lwt.return_unit)
+       Handler.close ~handlers ~srv ~client ~frame
     | _ ->
-       Lwt.return_unit
+       Handler.nop
   in
-  let handle_exn exn =
-    let err = Exn.to_string exn in
-    Logs.err ~src (fun m -> m "[RECV] %d: %s" id err);
-    Hashtbl.remove srv.clients id;
-    match handlers.on_error with
-    | Some f -> f ~exn client
-    | None -> Lwt.return_unit
-  in
+  let handle_exn = exn_handler ~handlers ~srv ~client in
   Lwt.catch handle_msg handle_exn
 
 let connect ~handlers srv conn =
